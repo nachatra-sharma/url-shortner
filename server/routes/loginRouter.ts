@@ -1,9 +1,9 @@
 import { TRPCError } from "@trpc/server";
-import { publicProcedure } from "../../config/trpc";
-import { loginInputType, loginReturnType } from "../../validation/login";
+import { publicProcedure } from "../config/trpc";
+import { loginInputType, loginReturnType } from "../validation/login";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { SECRET_KEY } from "../../config/serverConfig";
+import { SECRET_KEY } from "../config/serverConfig";
 
 export const loginRouter = publicProcedure
   .input(loginInputType)
@@ -35,12 +35,17 @@ export const loginRouter = publicProcedure
         });
       }
 
-      const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY);
+      const token = jwt.sign({ id: user.id, email: user.email }, SECRET_KEY, {
+        expiresIn: "1d",
+      });
 
       return {
         token,
       };
     } catch (error) {
+      if (error instanceof TRPCError) {
+        throw error;
+      }
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Something went wrong. Please try again.",

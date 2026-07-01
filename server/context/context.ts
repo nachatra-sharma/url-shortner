@@ -4,7 +4,6 @@ import jwt from "jsonwebtoken";
 export const createContext = async (opts: CreateHTTPContextOptions) => {
   let user: { id: number; email: string } | null = null;
   let token = opts.req.headers.authorization?.split(" ")[1];
-
   if (token) {
     try {
       const payload = jwt.verify(token, SECRET_KEY) as {

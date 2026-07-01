@@ -5,5 +5,5 @@ export const createShortURLInputType = z.object({
 });
 
 export const createShortURLOutputType = z.object({
-  shortURL: z.url(),
+  shortURL: z.string(),
 });

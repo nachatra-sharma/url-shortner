@@ -24,7 +24,7 @@ model User {
 model url {
   id          Int       @id           @default(autoincrement())
   originalURL String
-  shortURL    String
+  shortURL    String    @unique
   userId      Int
   user        User      @relation(fields: [userId], references: [id])
   createdAt   DateTime  @default(now())
