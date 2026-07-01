@@ -1,23 +1,33 @@
-import { publicProcedure } from "../../config/trpc";
+import { TRPCError } from "@trpc/server";
+import { authProcedure } from "../../middleware/auth";
 import {
   createShortURLInputType,
   createShortURLOutputType,
 } from "../../validation/createShortURL";
 import { nanoid } from "nanoid";
 
-export const createShortURL = publicProcedure
+export const createShortURL = authProcedure
   .input(createShortURLInputType)
   .output(createShortURLOutputType)
   .mutation(async (opts) => {
     const { input } = opts;
     const uuid = nanoid();
-
-    const response = await opts.ctx.db.url.create({
-      data: {
-        originalURL: input.originalURL,
-        userId: 123,
-        shortURL: `http://localhost/${uuid}`,
-      },
-    });
-    return { shortURL: "https://www.bitly123.com" };
+    try {
+      const response = await opts.ctx.db.url.create({
+        data: {
+          originalURL: input.originalURL,
+          userId: opts.ctx.user.id,
+          shortURL: `http://localhost:3000/${uuid}`,
+        },
+        select: {
+          shortURL: true,
+        },
+      });
+      return { shortURL: response.shortURL };
+    } catch (error) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Something went wrong while creating short url",
+      });
+    }
   });

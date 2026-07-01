@@ -1,10 +1,12 @@
 import { router } from "../config/trpc";
 import { createShortURL } from "./create/createShortURL";
-import { userRouter } from "./create/createUser";
+import { loginRouter } from "./create/loginRouter";
+import { signupRouter } from "./create/signupRouter";
 
 export const appRouter = router({
-  create: createShortURL,
-  user: userRouter,
+  createShortURL: createShortURL,
+  signup: signupRouter,
+  login: loginRouter,
 });
 
 export type AppRouter = typeof appRouter;
