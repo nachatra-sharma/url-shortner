@@ -8,17 +8,22 @@ const server = createHTTPServer({
   createContext,
   middleware: async (req, res, next) => {
     if (req.method === "GET") {
-      const code = req.url?.split("/")[1]?.split("?")[0];
-      if (code) {
-        const record = await prisma.url.findFirst({
-          where: {
-            shortURL: code,
-          },
-        });
-        if (record) {
-          res.writeHead(302, { location: record.originalURL });
-          res.end();
-          return;
+      if (req.url?.startsWith("/r/")) {
+        const code = req.url?.split("/")[2]?.split("?")[0];
+        if (code) {
+          const record = await prisma.url.findUnique({
+            where: {
+              shortURL: code,
+            },
+          });
+          if (record) {
+            res.writeHead(302, { location: record.originalURL });
+            res.end();
+            return;
+          } else {
+            res.writeHead(404);
+            return res.end("Invalid Short ID");
+          }
         }
       }
     }
